@@ -1,0 +1,20 @@
+{
+  "name": "carflow",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server_data_process.js",
+  "dependencies": {
+    "mongoose": "^4.10.7",
+    "passport-local-mongoose": "^4.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "C:\\\\git_Repos\\\\CarFlow"
+  },
+  "author": "",
+  "license": "ISC"
+}
