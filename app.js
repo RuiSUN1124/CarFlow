@@ -1,4 +1,6 @@
 //index
+
+var users = require('./routes/users');
 var express =require('express');
 //tools to handle path problems
 var path = require('path');
@@ -14,36 +16,75 @@ var mongoose = require('mongoose');
 //Login and anthentification
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var flash = require('connect-flash');
+var session = require('express-session');
 //TODO: 
 //      var users?
 var routes = require('./routes/index');
 var app = express();
 
+//mongoose?
+mongoose.connect('mongodb://localhost:27017/test1_carflow');
 //view engine setup
 app.set('views',path.join(__dirname,'views'));
-app.set('views engine','jade');
+app.set('view engine','jade');
 app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('rui'));
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
-app.use(require('express-session')({
+app.use(session({
     secret: 'keyboard cat',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
 }));
+app.use(flash());
 app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.static(path.join(__dirname,'public')));
 //routes
 app.use('/',routes);
 
 //passport config
-var User = require('./models/user');
-passport.use(new LocalStrategy(User.UserModel.authenticate()));
-passport.serializeUser(User.UserModel.serializeUser());
-passport.deserializeUser(User.UserModel.deserializeUser());
+var UserModule = require('./models/user');
+var User = UserModule.UserModel;
 
-//mongoose?
+// passport.serializeUser(User.serializeUser());
+
+// passport.deserializeUser(User.deserializeUser());
+passport.serializeUser(function(user, done) {
+console.log("Store session");
+  done(null, user.username);
+});
+
+passport.deserializeUser(function(username_d, done) {
+    
+console.log("Find session");
+  User.find({username:username_d}, function(err, user) {
+      if(err){
+          return done(err);
+      }    
+    done(err, user);
+  });
+});
+
+
+passport.use(new LocalStrategy((username,password,done)=>{
+    User.findOne({username:username},(err,user)=>{
+      if (err) { return done(err); }
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (!user.validPassword(password)) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);  
+    });
+    }
+));
+
+
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
