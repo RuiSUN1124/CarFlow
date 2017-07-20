@@ -1,17 +1,20 @@
 const express = require('express');
 const passport = require('passport');
-const User = require('../models/user');
 const router = express.Router();
+User = require('../models/user');
+Device = require('../models/device');
+Gate = require('../models/gate');
+Record = require('../models/record');
 
 passport.authenticationMiddleware = function authenticationMiddleware () {  
   return function (req, res, next) {
+      console.log('!!');
     if (req.isAuthenticated()) {
-      return next()
+      return next();
     }
     res.redirect('/')
   }
 }
-
 
 router.get('/', (req, res) => {
     res.render('index', { user : req.user });
@@ -27,26 +30,31 @@ router.post('/login', passport.authenticate('local', { failureRedirect: '/login'
         if (err) {
             return next(err);
         }else{
-        console.log("user");
-        res.redirect('/user');
+        res.redirect('/user/'+req.user.username);
         }
     });
 });
 
-router.get('/user',passport.authenticationMiddleware(),
+router.get('/user/:username',passport.authenticationMiddleware(),
 (req, res) => {
-  res.render('users');
+  res.render('users',{
+      username : req.user.username
+  });
 });
 
 router.get('/logout', (req, res, next) => {
     req.logout();
-    // req.session.save((err) => {
-    //     if (err) {
-    //         return next(err);
-    //     }
+
     res.redirect('/');
-    // }
-    );
 });
 
+// router.get('/device',passport.authenticationMiddleware(),(req,res)=>{
+//     Device.DeviceOp.findAll((err,data_all_json)=>{
+//         if(err){
+//             console.log('Device GET error');
+//         }else{
+//             res.json(data_all_json);
+//         }
+//     });   
+// });
 module.exports = router;

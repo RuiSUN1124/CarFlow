@@ -24,24 +24,26 @@ var routes = require('./routes/index');
 var app = express();
 
 //mongoose?
-mongoose.connect('mongodb://localhost:27017/test1_carflow');
+mongoose.createConnection('mongodb://localhost:27017/CarflowData');
 //view engine setup
 app.set('views',path.join(__dirname,'views'));
 app.set('view engine','jade');
 app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(cookieParser());
 
+app.use(express.static(path.join(__dirname,'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(cookieParser());
 app.use(session({
-    secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: false,
-}));
-app.use(flash());
+    secret: 'crackalackin',
+    resave: true,
+    saveUninitialized: true,
+    cookie : { secure : false, maxAge : (4 * 60 * 60 * 1000) },
+} ));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(express.static(path.join(__dirname,'public')));
+
+app.use(flash());
 //routes
 app.use('/',routes);
 
@@ -70,12 +72,15 @@ console.log("Find session");
 
 
 passport.use(new LocalStrategy((username,password,done)=>{
+    console.log('local');
     User.findOne({username:username},(err,user)=>{
       if (err) { return done(err); }
       if (!user) {
+         console.log('usrname no');
         return done(null, false, { message: 'Incorrect username.' });
       }
-      if (!user.validPassword(password)) {
+      if (!(user.password === password)) {
+          console.log('pwd no');
         return done(null, false, { message: 'Incorrect password.' });
       }
       return done(null, user);  
@@ -83,7 +88,14 @@ passport.use(new LocalStrategy((username,password,done)=>{
     }
 ));
 
-
+passport.authenticationMiddleware = function authenticationMiddleware () {  
+  return function (req, res, next) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.redirect('/')
+  }
+}
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
