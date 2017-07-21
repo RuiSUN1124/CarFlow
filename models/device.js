@@ -12,8 +12,7 @@ var DeviceSchema = new Schema({
     roadName: String,
 	setTime: String,
 });
-DeviceSchema.plugin(passportLocalMongoose);
-//collection name
+DeviceSchema.index({"deviceId":1},{unique: true});
 var DeviceModel = mongodb.mongoose.model('device',DeviceSchema);
 
 //operations
@@ -28,9 +27,7 @@ DeviceOp.prototype.save = function(obj,callback){
 
 DeviceOp.prototype.findAll = function(callback){
     DeviceModel.find({},'-_id -__v',(err, data_all)=>{ 
-//js obj convert to json            
-        var data_all_json = JSON.stringify(data_all);   
-        callback(err,data_all_json);        
+        callback(err,data_all);        
     });
 }
 exports.DeviceOp = new DeviceOp();

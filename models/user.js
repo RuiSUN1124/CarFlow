@@ -31,6 +31,11 @@ UserOp.prototype.validPassword = function(pwd) {
     return ( this.password === pwd );
 };
 
-
+UserOp.prototype.findAll = function(callback){
+    UserModel.find({},'-_id -__v',(err, data_all)=>{ 
+        var data_all_json = JSON.stringify(data_all);   
+        callback(err,data_all_json);        
+    });
+}
 exports.UserOp = new UserOp();
 exports.UserModel = UserModel;

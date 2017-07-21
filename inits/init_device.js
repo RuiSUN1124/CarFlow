@@ -1,7 +1,7 @@
 /*Init the devices*/
 var device = require('../models/device.js');
 var device_json = [{
-    deviceId: '5174',
+    deviceId: '5176',
     type: '00',
     location: {
         xPoint: 120.374394,
@@ -21,7 +21,7 @@ var device_json = [{
     roadName: '四号大道',
 	setTime: '2017-05-27 07：15',
 },{
-     deviceId: '5174',
+     deviceId: '5175',
     type: '00',
     location: {
         xPoint: 130.374394,

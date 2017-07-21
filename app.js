@@ -35,10 +35,10 @@ app.use(express.static(path.join(__dirname,'public')));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(session({
-    secret: 'crackalackin',
-    resave: true,
+    secret: 'sss',
+    resave: false,
     saveUninitialized: true,
-    cookie : { secure : false, maxAge : (4 * 60 * 60 * 1000) },
+    cookie : { secure : false, maxAge : (4 * 100 *100  * 1000) },
 } ));
 app.use(passport.initialize());
 app.use(passport.session());

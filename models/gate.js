@@ -11,7 +11,8 @@ var GateSchema = new Schema({
     roadName: String,
    setTime: String
 });
-GateSchema.plugin(passportLocalMongoose);
+GateSchema.index({"gateId":1},{unique: true});
+//GateSchema.plugin(passportLocalMongoose);
 //collection name
 var GateModel = mongodb.mongoose.model('gate',GateSchema);
 
@@ -25,5 +26,11 @@ GateOp.prototype.save = function(obj,callback){
     })
 }
 
+GateOp.prototype.findAll = function(callback){
+    GateModel.find({},'-_id -__v',(err, data_all)=>{ 
+        var data_all_json = JSON.stringify(data_all);   
+        callback(err,data_all_json);        
+    });
+}
 exports.GateOp = new GateOp();
 exports.GateModel = GateModel;
